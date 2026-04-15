@@ -74,40 +74,26 @@ const SCOPES = ['https://www.googleapis.com/auth/drive'];
 async function authenticate() {
   // --- Step 1: Read credentials from GOOGLE_CREDENTIALS env var ---
 
-  if (!credentialsEnv) {
-    console.error('');
-    console.error('❌  خطأ: متغير البيئة GOOGLE_CREDENTIALS غير موجود!');
-    console.error('');
-    console.error('   يرجى تعيين GOOGLE_CREDENTIALS بمحتوى ملف credentials.json');
-    console.error('');
-    console.error('   مثال:');
-    console.error('   GOOGLE_CREDENTIALS=\'{"installed":{"client_id":"...","client_secret":"...","redirect_uris":["..."]}}\'');
-    console.error('');
+let credentialsFile;
+
+if (process.env.GOOGLE_CREDENTIALS) {
+  try {
+    credentialsFile = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+  } catch (e) {
+    console.error("❌ Failed to parse GOOGLE_CREDENTIALS");
     process.exit(1);
   }
+} else {
+  console.error("❌ GOOGLE_CREDENTIALS is not set!");
+  process.exit(1);
+}
 
-  let credentialsFile;
+const credentials = credentialsFile.installed || credentialsFile.web;
 
-  if (process.env.GOOGLE_CREDENTIALS) {
-    // Render (production)
-    try {
-      credentialsFile = JSON.parse(process.env.GOOGLE_CREDENTIALS);
-    } catch (e) {
-      console.error('❌  فشل في قراءة GOOGLE_CREDENTIALS');
-      process.exit(1);
-    }
-  } else {
-    // Local (your case now)
-    credentialsFile = require("./credentials.json");
-  }
-
-  const credentials = credentialsFile.installed || credentialsFile.web;
-
-  if (!credentials) {
-    console.error('❌  GOOGLE_CREDENTIALS غير صالح!');
-    console.error('   تأكد أنه ملف OAuth2 وليس Service Account.');
-    process.exit(1);
-  }
+if (!credentials) {
+  console.error("❌ Invalid GOOGLE_CREDENTIALS format!");
+  process.exit(1);
+}
 
   // --- Step 2: Create OAuth2 client ---
   const { client_id, client_secret, redirect_uris } = credentials;
