@@ -1,0 +1,7 @@
+node_modules/
+credentials.json
+service-account.json
+token.json
+token.js
+uploads/
+.env
