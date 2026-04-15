@@ -73,7 +73,6 @@ const SCOPES = ['https://www.googleapis.com/auth/drive'];
 
 async function authenticate() {
   // --- Step 1: Read credentials from GOOGLE_CREDENTIALS env var ---
-  const credentialsEnv = require("./credentials.json");
 
   if (!credentialsEnv) {
     console.error('');
